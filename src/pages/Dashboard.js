@@ -5,6 +5,8 @@ import API from "../api/axios";
 
 export default function Dashboard() {
   const [logs, setLogs] = useState([]);
+    const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchLogs();
