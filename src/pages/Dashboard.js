@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, Card } from "antd";
+import { Table, Card ,Button} from "antd";
+import { useNavigate } from "react-router-dom"; // ✅ Added useNavigate
 import API from "../api/axios";
 
 export default function Dashboard() {
@@ -28,7 +29,14 @@ export default function Dashboard() {
   ];
 
   return (
-    <Card title="Phone Activity Logs">
+    <Card
+      title="Phone Activity Logs"
+      extra={
+        <Button type="primary" onClick={() => navigate("/assign-drivers")}>
+          Assign Drivers
+        </Button>
+      }
+    >
       <Table dataSource={logs} columns={columns} rowKey="id" />
     </Card>
   );
