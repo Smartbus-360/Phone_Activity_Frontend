@@ -26,7 +26,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AssignDrivers from "./pages/AssignDrivers";
-import HomePage from "./pages/Homepage"; // ✅ make sure file name matches
+// import HomePage from "./pages/Homepage"; // ✅ make sure file name matches
 import CreateSchoolAdmin from "./pages/CreateSchoolAdmin";
 import CreateSchool from "./pages/CreateSchool";
 
@@ -35,7 +35,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* ✅ Homepage route */}
-        <Route path="/homepage" element={<HomePage />} />
+        // <Route path="/homepage" element={<HomePage />} />
 
         {/* ✅ Login as root route */}
         <Route path="/" element={<Login />} />
