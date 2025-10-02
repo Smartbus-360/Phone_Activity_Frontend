@@ -5,8 +5,7 @@ import API from "../api/axios";
 
 export default function Dashboard() {
   const [logs, setLogs] = useState([]);
-    const navigate = useNavigate();
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchLogs();
@@ -20,6 +19,14 @@ export default function Dashboard() {
       console.error(err);
     }
   };
+    const handleLogout = () => {
+    // ✅ Clear token from localStorage
+    localStorage.removeItem("token");
+
+    // ✅ Redirect to login page
+    navigate("/");
+  };
+
 
   const columns = [
     { title: "Driver", dataIndex: ["Driver", "name"], key: "driver" },
@@ -34,12 +41,25 @@ export default function Dashboard() {
     <Card
       title="Phone Activity Logs"
       extra={
+        <>
         <Button type="primary" onClick={() => navigate("/assign-drivers")}>
           Assign Drivers
         </Button>
+              <Button style={{ marginLeft: 10 }} onClick={() => navigate("/create-school")}>
+        Create School
+      </Button>
+        <Button style={{ marginLeft: 10 }} onClick={() => navigate("/create-school-admin")}>
+        Create School Admin
+      </Button>
+      <Button danger style={{ marginLeft: 10 }} onClick={handleLogout}>
+            Logout
+          </Button>
+
+      </>
       }
     >
       <Table dataSource={logs} columns={columns} rowKey="id" />
     </Card>
+
   );
 }
