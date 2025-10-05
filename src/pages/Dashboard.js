@@ -108,7 +108,7 @@ const logColumns = [
       </>
       }
     >
-      // <Table dataSource={logs} columns={columns} rowKey="id" />
+{/* <Table dataSource={logs} columns={columns} rowKey="id" /> */}
       {!selectedDriver ? (
   <Table dataSource={drivers} columns={driverColumns} rowKey="id" />
 ) : (
