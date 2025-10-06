@@ -38,16 +38,16 @@
 
 // src/pages/DriverActivity.js
 import React, { useEffect, useState } from "react";
-import { Table, Card, Button, message, Spin } from "antd";
+import { Table, Card, Button, message, Spin, Descriptions } from "antd";
 import API from "../api/axios";
 
 export default function DriverActivity() {
   const [drivers, setDrivers] = useState([]);
   const [logs, setLogs] = useState([]);
-  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [driverInfo, setDriverInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch all drivers when page loads
+  // ✅ Fetch all drivers on load
   useEffect(() => {
     fetchDrivers();
   }, []);
@@ -55,7 +55,7 @@ export default function DriverActivity() {
   const fetchDrivers = async () => {
     setLoading(true);
     try {
-      const res = await API.get("/drivers"); // backend already supports filtering by role
+      const res = await API.get("/drivers");
       setDrivers(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -64,13 +64,13 @@ export default function DriverActivity() {
     setLoading(false);
   };
 
-  // ✅ Fetch activity for selected driver
+  // ✅ Fetch driver details + activities
   const fetchDriverActivity = async (driverId) => {
     setLoading(true);
     try {
       const res = await API.get(`/drivers/${driverId}/activity`);
-      setLogs(res.data.data || []);
-      setSelectedDriver(driverId);
+      setDriverInfo(res.data.driver || null);
+      setLogs(res.data.activity_logs || []);
     } catch (err) {
       console.error(err);
       message.error("Failed to fetch driver activity");
@@ -78,11 +78,11 @@ export default function DriverActivity() {
     setLoading(false);
   };
 
-  // ✅ Table for drivers
+  // ✅ Table for all drivers
   const driverColumns = [
-    { title: "Driver ID", dataIndex: "id", key: "id" },
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Username", dataIndex: "username", key: "username" },
+    { title: "ID", dataIndex: "id" },
+    { title: "Name", dataIndex: "name" },
+    { title: "Username", dataIndex: "username" },
     {
       title: "School",
       render: (record) => record.School?.name || "N/A",
@@ -97,22 +97,21 @@ export default function DriverActivity() {
     },
   ];
 
-  // ✅ Table for driver’s activities
+  // ✅ Columns for activities
   const activityColumns = [
-    { title: "Battery", dataIndex: "battery", key: "battery" },
-    { title: "Screen State", dataIndex: "screen_state", key: "screen_state" },
-    { title: "Foreground App", dataIndex: "foreground_app", key: "foreground_app" },
-    { title: "Data Usage (MB)", dataIndex: "data_usage_mb", key: "data_usage_mb" },
-    { title: "Institute", dataIndex: "institute_name", key: "institute_name" },
-    { title: "Timestamp", dataIndex: "created_at", key: "created_at" },
+    { title: "Battery", dataIndex: "battery" },
+    { title: "Screen State", dataIndex: "screen_state" },
+    { title: "Foreground App", dataIndex: "foreground_app" },
+    { title: "Data Usage (MB)", dataIndex: "data_usage_mb" },
+    { title: "Timestamp", dataIndex: "created_at" },
   ];
 
   return (
     <div style={{ padding: 20 }}>
       {loading ? (
         <Spin />
-      ) : !selectedDriver ? (
-        <Card title="All Drivers" bordered>
+      ) : !driverInfo ? (
+        <Card title="All Drivers">
           <Table
             columns={driverColumns}
             dataSource={drivers}
@@ -122,13 +121,22 @@ export default function DriverActivity() {
         </Card>
       ) : (
         <Card
-          title={`Activity Logs for Driver ID: ${selectedDriver}`}
+          title={`Activity Logs for ${driverInfo.name}`}
           extra={
-            <Button onClick={() => setSelectedDriver(null)} type="default">
+            <Button onClick={() => setDriverInfo(null)} type="default">
               ← Back to Drivers
             </Button>
           }
         >
+          {/* ✅ Driver Details Section */}
+          <Descriptions bordered column={1} size="small" style={{ marginBottom: 20 }}>
+            <Descriptions.Item label="Name">{driverInfo.name}</Descriptions.Item>
+            <Descriptions.Item label="Username">{driverInfo.username}</Descriptions.Item>
+            <Descriptions.Item label="Institute">{driverInfo.institute_name || "N/A"}</Descriptions.Item>
+            <Descriptions.Item label="School">{driverInfo.school || "N/A"}</Descriptions.Item>
+          </Descriptions>
+
+          {/* ✅ Activity Table */}
           <Table
             columns={activityColumns}
             dataSource={logs}
@@ -140,4 +148,3 @@ export default function DriverActivity() {
     </div>
   );
 }
-
