@@ -122,6 +122,7 @@
 //     </Card>
 
 
+// src/pages/Dashboard.js
 import React from "react";
 import { Card, Button, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -137,32 +138,24 @@ export default function Dashboard() {
       </h1>
 
       <Row gutter={[20, 20]} justify="center">
+        {/* ✅ Superadmin specific cards */}
         {role === "superadmin" && (
           <>
             <Col>
-              <Card title="Manage Schools" style={{ width: 250 }}>
-                <p>Create, edit, or delete schools.</p>
-                <Button type="primary" onClick={() => navigate("/create-school")}>
-                  Manage Schools
-                </Button>
-              </Card>
-            </Col>
-
-            <Col>
-              <Card title="Manage School Admins" style={{ width: 250 }}>
-                <p>Add or remove school admins.</p>
-                <Button type="primary" onClick={() => navigate("/create-school-admin")}>
-                  Manage Admins
+              <Card title="Manage Schools & Admins" style={{ width: 260 }}>
+                <p>View, add, or delete schools and their admins.</p>
+                <Button type="primary" onClick={() => navigate("/manage-schools")}>
+                  Open Page
                 </Button>
               </Card>
             </Col>
           </>
         )}
 
-        {/* Shared section for both roles */}
+        {/* ✅ Shared card (visible to both Superadmin and School Admin) */}
         <Col>
-          <Card title="Manage Drivers" style={{ width: 250 }}>
-            <p>View, assign, or register drivers.</p>
+          <Card title="Manage Drivers" style={{ width: 260 }}>
+            <p>View, assign, or register drivers for your school.</p>
             <Button type="primary" onClick={() => navigate("/assign-drivers")}>
               Manage Drivers
             </Button>
@@ -170,18 +163,26 @@ export default function Dashboard() {
         </Col>
 
         <Col>
-          <Card title="Driver Activities" style={{ width: 250 }}>
-            <p>View phone activity logs of drivers.</p>
+          <Card title="Driver Activities" style={{ width: 260 }}>
+            <p>View live activity logs of drivers.</p>
             <Button type="primary" onClick={() => navigate("/activity")}>
               View Activities
             </Button>
           </Card>
         </Col>
       </Row>
+
+      <div style={{ textAlign: "center", marginTop: 40 }}>
+        <Button
+          danger
+          onClick={() => {
+            localStorage.removeItem("token");
+            navigate("/");
+          }}
+        >
+          Logout
+        </Button>
+      </div>
     </div>
   );
 }
-
-
-//   );
-// }
