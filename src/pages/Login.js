@@ -11,9 +11,12 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await API.post("/auth/login", values);
+      // localStorage.setItem("token", res.data.token);
+      // localStorage.setItem("role", res.data.user.role);
+      // localStorage.setItem("schoolId", res.data.user.school_id);
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.user.role);
-      localStorage.setItem("schoolId", res.data.user.school_id);
+localStorage.setItem("user", JSON.stringify(res.data.user)); // ✅ Fixed — saves user object
+
       navigate("/dashboard");
     } catch (err) {
       alert("Invalid credentials");
