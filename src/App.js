@@ -28,6 +28,7 @@ import Dashboard from "./pages/Dashboard";
 import AssignDrivers from "./pages/AssignDrivers";
 import CreateSchoolAdmin from "./pages/CreateSchoolAdmin";
 import CreateSchool from "./pages/CreateSchool";
+import DriverActivity from "./pages/DriverActivity";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
         <Route path="/assign-drivers" element={<AssignDrivers />} />
         <Route path="/create-school-admin" element={<CreateSchoolAdmin />} />
         <Route path="/create-school" element={<CreateSchool />} />
+<Route path="/driver/:driverId/activity" element={<DriverActivity />} />
 
       </Routes>
     </BrowserRouter>
