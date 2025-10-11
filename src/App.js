@@ -43,6 +43,7 @@ function App() {
 
         {/* ✅ Other routes */}
         <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/activity" element={<DriverActivity />} />
         <Route path="/assign-drivers" element={<AssignDrivers />} />
         <Route path="/create-school-admin" element={<CreateSchoolAdmin />} />
         <Route path="/create-school" element={<CreateSchool />} />
