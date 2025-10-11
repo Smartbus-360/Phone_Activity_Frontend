@@ -198,24 +198,34 @@ export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
 
+  const [stats, setStats] = useState(null);
   const [schoolInfo, setSchoolInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🏫 Load school info if school admin
+  // 🧭 load data on mount
   useEffect(() => {
+    fetchStats();
     if (role === "schooladmin") fetchMySchool();
   }, []);
 
-  const fetchMySchool = async () => {
+  const fetchStats = async () => {
     try {
       setLoading(true);
-      const res = await API.get("/my-school"); // backend route for schooladmin
-      setSchoolInfo(res.data.data);
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to load school info");
+      const res = await API.get("/stats");
+      setStats(res.data.data);
+    } catch {
+      message.error("Failed to load statistics");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMySchool = async () => {
+    try {
+      const res = await API.get("/my-school");
+      setSchoolInfo(res.data.data);
+    } catch {
+      message.error("Failed to load school info");
     }
   };
 
@@ -225,57 +235,63 @@ export default function Dashboard() {
     navigate("/");
   };
 
+  // 🔹 Reusable stat tile
+  const StatCard = ({ title, value, color }) => (
+    <Card
+      style={{
+        width: 200,
+        textAlign: "center",
+        borderTop: `4px solid ${color}`,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      <h2 style={{ margin: 0, color }}>{value ?? "—"}</h2>
+      <p style={{ margin: 0 }}>{title}</p>
+    </Card>
+  );
+
   return (
     <div style={{ padding: 40 }}>
-      <h1 style={{ textAlign: "center", marginBottom: 30 }}>
-        {role === "superadmin"
-          ? "Super Admin Dashboard"
-          : "School Admin Dashboard"}
+      <h1 style={{ textAlign: "center", marginBottom: 20 }}>
+        {role === "superadmin" ? "Super Admin Dashboard" : "School Admin Dashboard"}
       </h1>
 
+      {/* 📊 Analytics Row */}
+      {stats && (
+        <Row gutter={[20, 20]} justify="center" style={{ marginBottom: 40 }}>
+          {role === "superadmin" && (
+            <>
+              <Col><StatCard title="Total Schools" value={stats.schoolCount} color="#1677ff" /></Col>
+              <Col><StatCard title="Total Admins" value={stats.adminCount} color="#722ed1" /></Col>
+            </>
+          )}
+          <Col><StatCard title="Total Drivers" value={stats.driverCount} color="#13c2c2" /></Col>
+          <Col><StatCard title="Total Activities" value={stats.activityCount} color="#eb2f96" /></Col>
+        </Row>
+      )}
+
+      {/* 🧩 Main feature cards */}
       <Row gutter={[20, 20]} justify="center">
-        {/* 🧩 SUPER ADMIN CARDS */}
         {role === "superadmin" && (
-          <>
-            <Col>
-              <Card title="🏫 Manage Schools & Admins" style={{ width: 280 }}>
-                <p>View, add, or update schools and their admins.</p>
-                <Button
-                  type="primary"
-                  onClick={() => navigate("/manage-schools")}
-                  block
-                >
-                  Open Page
-                </Button>
-              </Card>
-            </Col>
-          </>
+          <Col>
+            <Card title="🏫 Manage Schools & Admins" style={{ width: 280 }}>
+              <p>View, add, or update schools and their admins.</p>
+              <Button type="primary" onClick={() => navigate("/manage-schools")} block>
+                Open Page
+              </Button>
+            </Card>
+          </Col>
         )}
 
-        {/* 🧩 SCHOOL ADMIN CARD — My School Info */}
         {role === "schooladmin" && (
           <Col>
-            <Card
-              title="🏫 My School Information"
-              style={{ width: 280 }}
-              loading={loading}
-            >
+            <Card title="🏫 My School Information" style={{ width: 280 }}>
               {schoolInfo ? (
                 <>
-                  <p>
-                    <strong>Name:</strong> {schoolInfo.name}
-                  </p>
-                  {schoolInfo.address && (
-                    <p>
-                      <strong>Address:</strong> {schoolInfo.address}
-                    </p>
-                  )}
-                  <p>
-                    <strong>ID:</strong> {schoolInfo.id}
-                  </p>
-                  <Button onClick={fetchMySchool} block>
-                    Refresh
-                  </Button>
+                  <p><strong>Name:</strong> {schoolInfo.name}</p>
+                  {schoolInfo.address && <p><strong>Address:</strong> {schoolInfo.address}</p>}
+                  <p><strong>ID:</strong> {schoolInfo.id}</p>
+                  <Button onClick={fetchMySchool} block>Refresh</Button>
                 </>
               ) : (
                 <Spin />
@@ -284,15 +300,10 @@ export default function Dashboard() {
           </Col>
         )}
 
-        {/* 🧩 COMMON CARDS */}
         <Col>
           <Card title="🚌 Manage Drivers" style={{ width: 280 }}>
             <p>View or register drivers for your school.</p>
-            <Button
-              type="primary"
-              onClick={() => navigate("/assign-drivers")}
-              block
-            >
+            <Button type="primary" onClick={() => navigate("/assign-drivers")} block>
               Manage Drivers
             </Button>
           </Card>
@@ -301,11 +312,7 @@ export default function Dashboard() {
         <Col>
           <Card title="📱 Driver Activities" style={{ width: 280 }}>
             <p>View live activity logs of drivers.</p>
-            <Button
-              type="primary"
-              onClick={() => navigate("/activity")}
-              block
-            >
+            <Button type="primary" onClick={() => navigate("/activity")} block>
               View Activities
             </Button>
           </Card>
@@ -313,11 +320,8 @@ export default function Dashboard() {
       </Row>
 
       <div style={{ textAlign: "center", marginTop: 40 }}>
-        <Button danger onClick={handleLogout}>
-          Logout
-        </Button>
+        <Button danger onClick={handleLogout}>Logout</Button>
       </div>
     </div>
   );
 }
-
