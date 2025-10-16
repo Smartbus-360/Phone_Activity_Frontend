@@ -404,6 +404,8 @@ export default function AssignDrivers() {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+const [editModalOpen, setEditModalOpen] = useState(false);
+const [editingDriver, setEditingDriver] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
 
@@ -473,6 +475,50 @@ export default function AssignDrivers() {
     }
   };
 
+  // ✏️ Handle edit click
+const handleEdit = (driver) => {
+  setEditingDriver(driver);
+  form.setFieldsValue({
+    name: driver.name,
+    username: driver.username,
+  });
+  setEditModalOpen(true);
+};
+
+// ✅ Update driver API call
+const handleUpdateDriver = async (values) => {
+  try {
+    await API.put(`/drivers/${editingDriver.id}`, values);
+    message.success("✅ Driver updated successfully");
+    setEditModalOpen(false);
+    fetchDrivers();
+  } catch (err) {
+    console.error(err);
+    message.error("❌ Error updating driver");
+  }
+};
+
+const handleDelete = async (id) => {
+  Modal.confirm({
+    title: "Confirm Delete",
+    content: "Are you sure you want to delete this driver?",
+    okText: "Yes, Delete",
+    cancelText: "Cancel",
+    okType: "danger",
+    async onOk() {
+      try {
+        await API.delete(`/drivers/${id}`);
+        message.success("✅ Driver deleted successfully");
+        fetchDrivers();
+      } catch (err) {
+        console.error(err);
+        message.error("❌ Error deleting driver");
+      }
+    },
+  });
+};
+
+
   // 🔍 Search filter
   const filteredDrivers = drivers.filter((d) => {
     const text = searchText.toLowerCase();
@@ -539,6 +585,20 @@ export default function AssignDrivers() {
           },
         ]
       : []),
+    {
+      title: "Actions",
+      render: (_, record) => (
+        <Space>
+          <Button type="link" onClick={() => handleEdit(record)}>
+            Edit
+          </Button>
+          <Button type="link" danger onClick={() => handleDelete(record.id)}>
+            Delete
+          </Button>
+        </Space>
+      ),
+    },
+
   ];
 
   // 🧩 UI Layout
@@ -622,6 +682,29 @@ export default function AssignDrivers() {
           </Button>
         </Form>
       </Modal>
+            {/* ✏️ Edit Driver Modal */}
+<Modal
+  title="Edit Driver"
+  open={editModalOpen}
+  onCancel={() => setEditModalOpen(false)}
+  footer={null}
+>
+  <Form form={form} layout="vertical" onFinish={handleUpdateDriver}>
+    <Form.Item label="Driver Name" name="name" rules={[{ required: true }]}>
+      <Input />
+    </Form.Item>
+    <Form.Item label="Username" name="username" rules={[{ required: true }]}>
+      <Input />
+    </Form.Item>
+    <Form.Item label="New Password (optional)" name="password">
+      <Input.Password />
+    </Form.Item>
+    <Button type="primary" htmlType="submit" block>
+      Save Changes
+    </Button>
+  </Form>
+</Modal>
+
     </Card>
   );
 }
